@@ -10,6 +10,7 @@ import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import { useToast } from "@/hooks/use-toast";
 import { chatSession } from "@/service/AImodal";
 import { FcGoogle } from "react-icons/fc";
+import { LuLoaderCircle } from "react-icons/lu";
 import {
   Dialog,
   DialogContent,
@@ -20,11 +21,14 @@ import {
 } from "@/components/ui/dialog";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/service/FirebaseConfig";
 
 const CreateTrip = () => {
   const [place, setPlace] = useState();
   const [formData, setFormData] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const handleInputChange = (name, value) => {
@@ -59,6 +63,8 @@ const CreateTrip = () => {
       return;
     }
 
+    setLoading(true);
+
     const FINAL_PROMPT = AI_PROMPT.replace(
       "{location}",
       formData?.location?.label
@@ -68,11 +74,25 @@ const CreateTrip = () => {
       .replace("{budget}", formData?.budget)
       .replace("{days}", formData?.noOfDays);
 
-    console.log(FINAL_PROMPT);
-
     const result = await chatSession.sendMessage(FINAL_PROMPT);
 
     console.log(result?.response?.text());
+
+    setLoading(false);
+    saveAiTrip(result?.response?.text());
+  };
+
+  const saveAiTrip = async (TripData) => {
+    setLoading(true);
+    const user = JSON.parse(localStorage.getItem("user"));
+    const docId = Date.now().toString();
+    await setDoc(doc(db, "Aitrips", docId), {
+      userSelection: formData,
+      tripData: JSON.parse(TripData),
+      userEmail: user.email,
+      id: docId,
+    });
+    setLoading(false);
   };
 
   const GetUserProfile = (tokenInfo) => {
@@ -173,7 +193,13 @@ const CreateTrip = () => {
       </div>
 
       <div className=" mt-10 flex justify-end">
-        <Button onClick={onGenerateTrip}>Genearte Trip</Button>
+        <Button disabled={loading} onClick={onGenerateTrip}>
+          {loading ? (
+            <LuLoaderCircle className=" h-7 w-7 animate-spin" />
+          ) : (
+            <>Generate Trip</>
+          )}
+        </Button>
       </div>
 
       <Dialog open={openDialog}>
