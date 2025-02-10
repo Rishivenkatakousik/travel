@@ -37,10 +37,6 @@ const CreateTrip = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
-
   const login = useGoogleLogin({
     onSuccess: (codeResp) => GetUserProfile(codeResp),
     onError: (error) => console.log(error),
@@ -77,8 +73,6 @@ const CreateTrip = () => {
       .replace("{days}", formData?.noOfDays);
 
     const result = await chatSession.sendMessage(FINAL_PROMPT);
-
-    console.log(result?.response?.text());
 
     setLoading(false);
     saveAiTrip(result?.response?.text());

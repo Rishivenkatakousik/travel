@@ -1,12 +1,25 @@
 import { Button } from "@/components/ui/button";
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import { FaShare } from "react-icons/fa";
+import axios from "axios";
+import { fetchPlacePhoto } from "@/service/GlobalApi";
 
 const InfoSection = ({ trip }) => {
+  const [photoUrl, setPhotoUrl] = useState(null);
+
+  const place_name = trip?.userSelection?.location?.label;
+
+  useEffect(() => {
+    const photoUrl = fetchPlacePhoto(place_name, setPhotoUrl).then((result) => {
+      setPhotoUrl(result);
+    });
+  }, [trip]);
+
   return (
     <div>
       <img
-        src="/Travel.jpeg"
+        src={photoUrl ? photoUrl : "/Travel.jpeg"}
         alt="Photo"
         className=" h-[340px] w-full object-cover rounded-xl"
       />
