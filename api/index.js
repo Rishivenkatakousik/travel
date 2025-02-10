@@ -5,7 +5,7 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 
-const GOOGLE_MAPS_API_KEY = "AIzaSyA46lC4ZXV8lBGU8G4b9U59_6YYxkVJKm4"; // Replace with your actual API key
+const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY; // Replace with your actual API key
 
 // Function to fetch places based on query
 const fetchPlaces = async (query) => {
