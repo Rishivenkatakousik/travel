@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "https://travel-hs2t.onrender.com";
 const API_KEY = "AIzaSyA46lC4ZXV8lBGU8G4b9U59_6YYxkVJKm4"; // Replace with your actual API key
 
 const getPhotoUrl = (photoRef) =>
