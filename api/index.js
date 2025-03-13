@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
+const { sendEmailNotification } = require("./notify");
 
 const app = express();
 app.use(cors());
@@ -51,6 +52,17 @@ app.get("/photoRef", async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch photo reference" });
     }
+});
+
+app.get('/track-visit', async (req, res) => {
+    const visitorIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'];
+    const visitTime = new Date();
+
+    // Send email notification (explained in step 2)
+    await sendEmailNotification(visitorIP, userAgent, visitTime);
+
+    res.status(200).json({ message: "Visit logged successfully" });
 });
 
 app.listen(5000, () => console.log("Server running on port 5000"));
